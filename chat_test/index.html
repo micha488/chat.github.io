@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <title>WebSocket чат</title>
+    <style>
+        #chat { width: 100%; height: 500px; border: 1px solid #ccc; overflow-y: scroll; }
+        #message { width: 300px; }
+    </style>
+</head>
+<body>
+    <div id="chat"></div>
+    <input type="text" id="message" placeholder="Введіть повідомлення" />
+    <button onclick="sendMessage()">Надіслати</button>
+
+    <script>
+        const chat = document.getElementById("chat");
+        const messageInput = document.getElementById("message");
+
+        const ws = new WebSocket('ws://localhost:8080');
+
+        ws.onopen = () => {
+            addMessageToChat("З'єднання встановлено");
+        }
+
+        ws.onmessage = (event) => {
+            addMessageToChat(event.data);
+        }
+
+        ws.onclose = () => {
+            addMessageToChat("З'єднання закрито");
+        }
+
+        function sendMessage() {
+            const message = messageInput.value;
+            if (message) {
+                ws.send(message);
+                messageInput.value = '';
+            }
+        }
+
+        function addMessageToChat(message) {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = message;
+            chat.appendChild(messageElement);
+            chat.scrollTop = chat.scrollHeight;
+        }
+f
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        })
+    </script>
+</body>
+</html>
